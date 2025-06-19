@@ -9,6 +9,13 @@ defmodule Voli.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
+    has_many :tasks, Voli.Accountability.Task
+    has_many :habits, Voli.Accountability.Habit
+    has_many :habit_completions, Voli.Accountability.HabitCompletion
+
+    has_many :sent_friend_requests, Voli.Accounts.Friendship, foreign_key: :requester_id
+    has_many :received_friend_requests, Voli.Accounts.Friendship, foreign_key: :receiver_id
+
     timestamps(type: :utc_datetime)
   end
 
