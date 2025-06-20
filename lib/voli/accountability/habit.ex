@@ -14,8 +14,8 @@ defmodule Voli.Accountability.Habit do
 
     belongs_to :user, Voli.Accounts.User
 
-    has_many :habit_completions, Voli.Accountability.HabitCompletion
-    has_many :time_entries, Voli.Accountability.TimeEntry
+    has_many :habit_completions, Voli.Accountability.HabitCompletion, on_delete: :delete_all
+    has_many :time_entries, Voli.Accountability.TimeEntry, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end
