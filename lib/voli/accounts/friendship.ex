@@ -2,9 +2,6 @@ defmodule Voli.Accounts.Friendship do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
-
   schema "friendships" do
     field :status, :string
 
@@ -17,7 +14,10 @@ defmodule Voli.Accounts.Friendship do
   @doc false
   def changeset(friendship, attrs) do
     friendship
-    |> cast(attrs, [:status])
-    |> validate_required([:status])
+    |> cast(attrs, [:status, :requester_id, :receiver_id])
+    |> validate_required([:status, :requester_id, :receiver_id])
+    |> validate_inclusion(:status, ["pending", "accepted", "declined"])
+    |> check_constraint(:requester_id, name: :friendships_requester_id_fkey)
+    |> check_constraint(:receiver_id, name: :friendships_receiver_id_fkey)
   end
 end

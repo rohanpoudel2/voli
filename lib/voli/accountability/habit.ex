@@ -23,7 +23,16 @@ defmodule Voli.Accountability.Habit do
   @doc false
   def changeset(habit, attrs) do
     habit
-    |> cast(attrs, [:title, :description, :frequency, :start_date])
-    |> validate_required([:title, :description, :frequency, :start_date])
+    |> cast(attrs, [
+      :title,
+      :description,
+      :frequency,
+      :start_date,
+      :current_streak,
+      :longest_streak,
+      :streak_start_date,
+      :streak_last_updated_at
+    ])
+    |> validate_required([:title, :frequency])
   end
 end

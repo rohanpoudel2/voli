@@ -505,4 +505,61 @@ defmodule Voli.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "friendships" do
+    alias Voli.Accounts.Friendship
+
+    test "send_friend_request/2 creates a pending friendship" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+
+      assert {:ok, %Friendship{} = friendship} = Accounts.send_friend_request(user1, user2)
+      assert friendship.status == "pending"
+      assert friendship.requester_id == user1.id
+      assert friendship.receiver_id == user2.id
+    end
+
+    test "accept_friend_request/1 changes a friendship status to 'accepted'" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, friendship} = Accounts.send_friend_request(user1, user2)
+
+      assert {:ok, %Friendship{} = accepted_friendship} =
+               Accounts.accept_friend_request(friendship)
+
+      assert accepted_friendship.status == "accepted"
+    end
+
+    test "decline_friend_request/1 deletes the friendship" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      {:ok, friendship} = Accounts.send_friend_request(user1, user2)
+
+      assert {:ok, %Friendship{}} = Accounts.decline_friend_request(friendship)
+      assert Accounts.get_friendship(friendship.id) == nil
+    end
+
+    test "list_friends/1 returns all accepted friends" do
+      user1 = user_fixture()
+      user2 = user_fixture()
+      user3 = user_fixture()
+      user4_pending = user_fixture()
+
+      {:ok, req1} = Accounts.send_friend_request(user1, user2)
+      Accounts.accept_friend_request(req1)
+
+      {:ok, req2} = Accounts.send_friend_request(user3, user1)
+      Accounts.accept_friend_request(req2)
+
+      Accounts.send_friend_request(user1, user4_pending)
+
+      friends_of_user1 = Accounts.list_friends(user1)
+
+      friend_ids = Enum.map(friends_of_user1, & &1.id)
+      assert user2.id in friend_ids
+      assert user3.id in friend_ids
+      refute user4_pending.id in friend_ids
+      assert length(friends_of_user1) == 2
+    end
+  end
 end

@@ -6,7 +6,7 @@ defmodule Voli.Accounts do
   import Ecto.Query, warn: false
   alias Voli.Repo
 
-  alias Voli.Accounts.{User, UserToken, UserNotifier}
+  alias Voli.Accounts.{User, UserToken, UserNotifier, Friendship}
 
   ## Database getters
 
@@ -349,5 +349,52 @@ defmodule Voli.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  ## Friendships
+
+  def send_friend_request(%User{} = requester, %User{} = receiver) do
+    %Friendship{}
+    |> Friendship.changeset(%{
+      requester_id: requester.id,
+      receiver_id: receiver.id,
+      status: "pending"
+    })
+    |> Repo.insert()
+  end
+
+  def accept_friend_request(%Friendship{} = friendship) do
+    friendship
+    |> Friendship.changeset(%{status: "accepted"})
+    |> Repo.update()
+  end
+
+  def decline_friend_request(%Friendship{} = friendship) do
+    Repo.delete(friendship)
+  end
+
+  def get_friendship(id) do
+    Repo.get(Friendship, id)
+  end
+
+  def list_friends(%User{} = user) do
+    requester_friend_ids =
+      from(f in Friendship,
+        where: f.requester_id == ^user.id and f.status == "accepted",
+        select: f.receiver_id
+      )
+      |> Repo.all()
+
+    receiver_friend_ids =
+      from(f in Friendship,
+        where: f.receiver_id == ^user.id and f.status == "accepted",
+        select: f.requester_id
+      )
+      |> Repo.all()
+
+    friend_ids = Enum.uniq(requester_friend_ids ++ receiver_friend_ids)
+
+    from(u in User, where: u.id in ^friend_ids)
+    |> Repo.all()
   end
 end

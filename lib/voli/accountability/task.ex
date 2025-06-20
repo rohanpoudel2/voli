@@ -18,6 +18,6 @@ defmodule Voli.Accountability.Task do
   def changeset(task, attrs) do
     task
     |> cast(attrs, [:title, :description, :due_date, :completed_at])
-    |> validate_required([:title, :description, :due_date, :completed_at])
+    |> validate_required([:title])
   end
 end
