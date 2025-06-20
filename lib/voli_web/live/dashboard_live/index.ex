@@ -56,6 +56,6 @@ defmodule VoliWeb.DashboardLive.Index do
       |> put_flash(:info, "Habit created successfully.")
       |> stream_insert(:habits, habit, at: 0)
 
-    {:noreply, socket}
+    {:noreply, assign(socket, :show_habit_modal, false)}
   end
 end

@@ -26,7 +26,7 @@
   <div>
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-semibold mb-4">My Habits</h2>
-      <.button phx-click={JS.show(to: "#habit-form-modal")}>New Habit</.button>
+      <.button phx-click="show_habit_modal">New Habit</.button>
     </div>
     <div id="habits" phx-update="stream" class="space-y-4">
       <div
@@ -51,11 +51,10 @@
   />
 </.modal>
 
-<.modal id="habit-form-modal" show={false} on_cancel={JS.hide(to: "#habit-form-modal")}>
+<.modal :if={@show_habit_modal} id="habit-form-modal" show on_cancel={JS.push("hide_habit_modal")}>
   <.live_component
     module={VoliWeb.HabitFormComponent}
     id="habit-form-component"
     current_user={@current_user}
-    on_save={JS.hide(to: "#habit-form-modal")}
   />
 </.modal>
