@@ -8,13 +8,13 @@ defmodule VoliWeb.UserSessionControllerTest do
   end
 
   describe "POST /users/log_in" do
-    test "logs the user in and redirects to dashboard", %{conn: conn, user: user} do
+    test "logs the user in and redirects to /", %{conn: conn, user: user} do
       conn =
         post(conn, ~p"/users/log_in", %{
           "user" => %{"email" => user.email, "password" => valid_user_password()}
         })
 
-      assert redirected_to(conn) == ~p"/dashboard"
+      assert redirected_to(conn) == ~p"/"
       assert get_session(conn, :user_token)
     end
 
@@ -28,7 +28,7 @@ defmodule VoliWeb.UserSessionControllerTest do
           }
         })
 
-      assert redirected_to(conn) == ~p"/dashboard"
+      assert redirected_to(conn) == ~p"/"
       assert conn.resp_cookies["_voli_web_user_remember_me"]
     end
 

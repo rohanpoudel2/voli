@@ -52,7 +52,8 @@ defmodule VoliWeb.DashboardLive.Index do
     task = Accountability.get_task!(task_id)
     {:ok, updated_task} = Accountability.toggle_task_completion(task)
 
-    {:noreply, stream_insert(socket, :tasks, updated_task)}
+    socket = stream_delete(socket, :tasks, task)
+    {:noreply, stream_insert(socket, :tasks, updated_task, at: 0)}
   end
 
   @impl true
