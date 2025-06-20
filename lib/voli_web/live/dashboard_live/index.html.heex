@@ -1,0 +1,61 @@
+<.flash_group flash={@flash} />
+
+<.header>
+  {@page_title}
+</.header>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div>
+    <h2 class="text-2xl font-semibold mb-4 flex justify-between items-center">
+      <span>My Tasks</span>
+      <.button phx-click="show_task_modal">New Task</.button>
+    </h2>
+
+    <div id="tasks" phx-update="stream" class="space-y-4">
+      <div
+        :for={{dom_id, task} <- @streams.tasks}
+        id={dom_id}
+        class="p-4 bg-white rounded-lg shadow"
+      >
+        <h3 class="font-bold">{task.title}</h3>
+        <p class="text-gray-600">{task.description}</p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold mb-4">My Habits</h2>
+      <.button phx-click={JS.show(to: "#habit-form-modal")}>New Habit</.button>
+    </div>
+    <div id="habits" phx-update="stream" class="space-y-4">
+      <div
+        :for={{dom_id, habit} <- @streams.habits}
+        id={dom_id}
+        class="p-4 bg-white rounded-lg shadow"
+      >
+        <h3 class="font-bold">{habit.title}</h3>
+        <p class="text-gray-600">{habit.description}</p>
+        <p class="text-sm text-blue-500">Frequency: {habit.frequency}</p>
+        <p class="text-sm text-green-600">Current Streak: {habit.current_streak}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<.modal :if={@show_task_modal} id="task-form-modal" show on_cancel={JS.push("hide_task_modal")}>
+  <.live_component
+    module={VoliWeb.TaskFormComponent}
+    id="task-form-component"
+    current_user={@current_user}
+  />
+</.modal>
+
+<.modal id="habit-form-modal" show={false} on_cancel={JS.hide(to: "#habit-form-modal")}>
+  <.live_component
+    module={VoliWeb.HabitFormComponent}
+    id="habit-form-component"
+    current_user={@current_user}
+    on_save={JS.hide(to: "#habit-form-modal")}
+  />
+</.modal>

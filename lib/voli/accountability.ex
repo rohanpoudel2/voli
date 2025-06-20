@@ -114,4 +114,12 @@ defmodule Voli.Accountability do
 
     Habit.changeset(habit, changes)
   end
+
+  def change_task(%Task{} = task, attrs \\ %{}) do
+    Task.changeset(task, attrs)
+  end
+
+  def change_habit(%Habit{} = habit, attrs \\ %{}) do
+    Habit.changeset(habit, attrs)
+  end
 end

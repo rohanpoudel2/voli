@@ -1,0 +1,27 @@
+<div>
+  <.header>
+    New Habit
+    <:subtitle>Add a new habit to your list.</:subtitle>
+  </.header>
+
+  <.simple_form
+    for={@form}
+    id="habit-form"
+    phx-change="validate"
+    phx-submit="save"
+    phx-target={@myself}
+  >
+    <.input field={@form[:title]} type="text" label="Title" />
+    <.input field={@form[:description]} type="textarea" label="Description" />
+    <.input
+      field={@form[:frequency]}
+      type="select"
+      label="Frequency"
+      options={["daily", "weekly", "monthly"]}
+    />
+
+    <:actions>
+      <.button phx-disable-with="Saving...">Save Habit</.button>
+    </:actions>
+  </.simple_form>
+</div>

@@ -1,0 +1,22 @@
+<div>
+  <.header>
+    New Task
+    <:subtitle>Add a new task to your list.</:subtitle>
+  </.header>
+
+  <.simple_form
+    for={@form}
+    id="task-form"
+    phx-change="validate"
+    phx-submit="save"
+    phx-target={@myself}
+  >
+    <.input field={@form[:title]} type="text" label="Title" />
+    <.input field={@form[:description]} type="textarea" label="Description" />
+    <.input field={@form[:due_date]} type="date" label="Due Date" />
+
+    <:actions>
+      <.button phx-disable-with="Saving...">Save Task</.button>
+    </:actions>
+  </.simple_form>
+</div>
