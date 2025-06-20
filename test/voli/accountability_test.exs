@@ -58,6 +58,19 @@ defmodule Voli.AccountabilityTest do
       assert {:ok, %Task{}} = Accountability.delete_task(task)
       assert_raise Ecto.NoResultsError, fn -> Accountability.get_task!(task.id) end
     end
+
+    test "toggle_task_completion/1 toggles the completed_at_status" do
+      user = user_fixture()
+      task = task_fixture(user)
+
+      assert is_nil(task.completed_at)
+
+      {:ok, completed_task} = Accountability.toggle_task_completion(task)
+      assert !is_nil(completed_task.completed_at)
+
+      {:ok, incompleted_task} = Accountability.toggle_task_completion(completed_task)
+      assert is_nil(incompleted_task.completed_at)
+    end
   end
 
   describe "habits" do

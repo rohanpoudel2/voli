@@ -182,6 +182,10 @@ defmodule VoliWeb.UserAuth do
     end)
   end
 
+  @spec redirect_if_user_is_authenticated(
+          atom() | %{:assigns => nil | maybe_improper_list() | map(), optional(any()) => any()},
+          any()
+        ) :: atom() | %{:assigns => nil | maybe_improper_list() | map(), optional(any()) => any()}
   @doc """
   Used for routes that require the user to not be authenticated.
   """

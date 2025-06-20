@@ -122,4 +122,16 @@ defmodule Voli.Accountability do
   def change_habit(%Habit{} = habit, attrs \\ %{}) do
     Habit.changeset(habit, attrs)
   end
+
+  def toggle_task_completion(%Task{} = task) do
+    changes =
+      if is_nil(task.completed_at) do
+        %{completed_at: DateTime.utc_now()}
+      else
+        %{completed_at: nil}
+      end
+
+    Task.changeset(task, changes)
+    |> Repo.update()
+  end
 end

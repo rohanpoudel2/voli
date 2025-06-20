@@ -40,6 +40,23 @@ defmodule VoliWeb.DashboardLive.Index do
   end
 
   @impl true
+  def handle_event("delete_task", %{"id" => task_id}, socket) do
+    task = Accountability.get_task!(task_id)
+    {:ok, _} = Accountability.delete_task(task)
+
+    {:noreply, stream_delete(socket, :tasks, task)}
+  end
+
+  @impl true
+  def handle_event("toggle_task_completion", %{"id" => task_id}, socket) do
+    task = Accountability.get_task!(task_id)
+    {:ok, updated_task} = Accountability.toggle_task_completion(task)
+
+    socket = stream_delete(socket, :tasks, task)
+    {:noreply, stream_insert(socket, :tasks, updated_task, at: 0)}
+  end
+
+  @impl true
   def handle_info({:task_created, task}, socket) do
     socket =
       socket
@@ -56,6 +73,6 @@ defmodule VoliWeb.DashboardLive.Index do
       |> put_flash(:info, "Habit created successfully.")
       |> stream_insert(:habits, habit, at: 0)
 
-    {:noreply, socket}
+    {:noreply, assign(socket, :show_habit_modal, false)}
   end
 end
