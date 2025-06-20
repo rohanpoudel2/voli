@@ -9,7 +9,7 @@ defmodule Voli.Accountability.Task do
     field :title, :string
 
     belongs_to :user, Voli.Accounts.User
-    has_many :time_entries, Voli.Accountability.TimeEntry
+    has_many :time_entries, Voli.Accountability.TimeEntry, on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

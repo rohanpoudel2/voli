@@ -57,6 +57,38 @@ defmodule VoliWeb.DashboardLive.Index do
   end
 
   @impl true
+  def handle_event("log_habit_completion", %{"id" => habit_id}, socket) do
+    habit = Accountability.get_habit!(habit_id)
+    today = Date.utc_today()
+
+    case Accountability.log_habit_completion(habit, socket.assigns.current_user, today) do
+      {:ok, %{habit: updated_habit}} ->
+        socket =
+          socket
+          |> put_flash(:info, "'#{updated_habit.title}' completed for today!")
+          |> stream_insert(:habits, updated_habit)
+
+        {:noreply, socket}
+
+      {:error, :already_completed_today} ->
+        socket = put_flash(socket, :error, "You've already logged that habit today.")
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("delete_habit", %{"id" => habit_id}, socket) do
+    habit = Accountability.get_habit!(habit_id)
+    {:ok, _} = Accountability.delete_habit(habit)
+
+    socket =
+      socket
+      |> put_flash(:info, "Habit '#{habit.title}' deleted successfully.")
+      |> stream_delete(:habits, habit)
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:task_created, task}, socket) do
     socket =
       socket
