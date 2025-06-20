@@ -5,7 +5,9 @@ defmodule VoliWeb.UserSessionController do
   alias VoliWeb.UserAuth
 
   def create(conn, %{"_action" => "registered"} = params) do
-    create(conn, params, "Account created successfully!")
+    conn
+    |> put_session(:user_return_to, ~p"/")
+    |> create(params, "Account created successfully!")
   end
 
   def create(conn, %{"_action" => "password_updated"} = params) do
@@ -25,7 +27,6 @@ defmodule VoliWeb.UserSessionController do
       conn
       |> put_flash(:info, info)
       |> UserAuth.log_in_user(user, user_params)
-      |> redirect(to: ~p"/dashboard")
     else
       conn
       |> put_flash(:error, "Invalid email or password")
