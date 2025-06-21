@@ -2,10 +2,17 @@ defmodule VoliWeb.DashboardLive.Index do
   use VoliWeb, :live_view
 
   alias Voli.Accountability
+  alias Voli.Accounts
 
   @impl true
   def mount(_params, _session, socket) do
     current_user = socket.assigns.current_user
+
+    if connected?(socket) do
+      VoliWeb.Endpoint.subscribe("user:#{current_user.id}")
+      friends = Accounts.list_friends(current_user)
+      for friend <- friends, do: VoliWeb.Endpoint.subscribe("user:#{friend.id}")
+    end
 
     socket =
       socket
@@ -106,5 +113,30 @@ defmodule VoliWeb.DashboardLive.Index do
       |> stream_insert(:habits, habit, at: 0)
 
     {:noreply, assign(socket, :show_habit_modal, false)}
+  end
+
+  @impl true
+  def handle_info({:task_completed, task}, socket) do
+    if task.user_id != socket.assigns.current_user.id do
+      friend = Accounts.get_user!(task.user_id)
+      flash_message = "#{friend.email} just completed a task: '#{task.title}'"
+      {:noreply, put_flash(socket, :info, flash_message)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:habit_completed, user, habit}, socket) do
+    if user.id != socket.assigns.current_user.id do
+      friend = Accounts.get_user!(user.id)
+
+      flash_message =
+        "#{friend.email} just completed a habit: '#{habit.title}! Their streak is now #{habit.current_streak}.'"
+
+      {:noreply, put_flash(socket, :info, flash_message)}
+    else
+      {:noreply, socket}
+    end
   end
 end

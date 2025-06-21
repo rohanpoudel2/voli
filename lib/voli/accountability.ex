@@ -63,14 +63,23 @@ defmodule Voli.Accountability do
     if completion_exists?(habit, completion_date) do
       {:error, :already_completed_today}
     else
-      Multi.new()
-      |> Multi.insert(:completion, %HabitCompletion{
-        habit_id: habit.id,
-        user_id: user.id,
-        completed_at: completion_date
-      })
-      |> Multi.update(:habit, &update_habit_streak(&1, habit.id, completion_date))
-      |> Repo.transaction()
+      with {:ok, %{habit: updated_habit, completion: completion}} <-
+             Multi.new()
+             |> Multi.insert(:completion, %HabitCompletion{
+               habit_id: habit.id,
+               user_id: user.id,
+               completed_at: completion_date
+             })
+             |> Multi.update(:habit, &update_habit_streak(&1, habit.id, completion_date))
+             |> Repo.transaction() do
+        Phoenix.PubSub.broadcast(
+          Voli.PubSub,
+          "user:#{user.id}",
+          {:habit_completed, user, updated_habit}
+        )
+
+        {:ok, %{completion: completion, habit: updated_habit}}
+      end
     end
   end
 
@@ -131,7 +140,16 @@ defmodule Voli.Accountability do
         %{completed_at: nil}
       end
 
-    Task.changeset(task, changes)
-    |> Repo.update()
+    with {:ok, updated_task} <- Task.changeset(task, changes) |> Repo.update() do
+      if updated_task.completed_at do
+        Phoenix.PubSub.broadcast(
+          Voli.PubSub,
+          "user:#{task.user_id}",
+          {:task_completed, updated_task}
+        )
+      end
+
+      {:ok, updated_task}
+    end
   end
 end
