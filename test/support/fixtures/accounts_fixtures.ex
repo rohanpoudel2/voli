@@ -7,6 +7,7 @@ defmodule Voli.AccountsFixtures do
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
 
+  @spec valid_user_attributes(any()) :: any()
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
       email: unique_user_email(),
@@ -27,5 +28,19 @@ defmodule Voli.AccountsFixtures do
     {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
     [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
     token
+  end
+
+  @doc """
+  Generate a friends.
+  """
+  def friends_fixture(attrs \\ %{}) do
+    {:ok, friends} =
+      attrs
+      |> Enum.into(%{
+
+      })
+      |> Voli.Accounts.create_friends()
+
+    friends
   end
 end

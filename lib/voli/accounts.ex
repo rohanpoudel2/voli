@@ -373,8 +373,8 @@ defmodule Voli.Accounts do
     Repo.delete(friendship)
   end
 
-  def get_friendship(id) do
-    Repo.get(Friendship, id)
+  def get_friendship!(id) do
+    Repo.get!(Friendship, id)
   end
 
   def list_friends(%User{} = user) do
@@ -396,5 +396,48 @@ defmodule Voli.Accounts do
 
     from(u in User, where: u.id in ^friend_ids)
     |> Repo.all()
+  end
+
+  def list_pending_requests(%User{} = user) do
+    from(f in Friendship,
+      where: f.receiver_id == ^user.id and f.status == "pending",
+      preload: [:requester]
+    )
+    |> Repo.all()
+  end
+
+  alias Voli.Accounts.Friends
+
+  def list_index do
+    Repo.all(Friends)
+  end
+
+  def get_friends!(id), do: Repo.get!(Friends, id)
+
+  def create_friends(attrs \\ %{}) do
+    %Friends{}
+    |> Friends.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_friends(%Friends{} = friends, attrs) do
+    friends
+    |> Friends.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_friends(%Friends{} = friends) do
+    Repo.delete(friends)
+  end
+
+  def change_friends(%Friends{} = friends, attrs \\ %{}) do
+    Friends.changeset(friends, attrs)
+  end
+
+  def change_friend_search(attrs \\ %{}) do
+    {%{}, %{email: :string}}
+    |> Ecto.Changeset.cast(attrs, [:email])
+    |> Ecto.Changeset.validate_required([:email])
+    |> Ecto.Changeset.validate_format(:email, ~r/@/)
   end
 end
