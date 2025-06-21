@@ -96,12 +96,6 @@ defmodule VoliWeb.DashboardLive.Index do
   end
 
   @impl true
-  @spec handle_info(
-          {:habit_created, any()}
-          | {:task_completed, atom() | %{:user_id => any(), optional(any()) => any()}}
-          | {:task_created, any()},
-          atom() | %{:assigns => atom() | map(), optional(any()) => any()}
-        ) :: {:noreply, atom() | map()}
   def handle_info({:task_created, task}, socket) do
     socket =
       socket

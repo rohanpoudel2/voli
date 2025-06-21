@@ -6,7 +6,6 @@ defmodule Voli.Accountability do
   alias Voli.Accountability.Task
   alias Voli.Accountability.Habit
   alias Voli.Accountability.HabitCompletion
-  alias Voli.PubSub
 
   def create_task(user, attrs \\ %{}) do
     %Task{user_id: user.id}
@@ -64,7 +63,7 @@ defmodule Voli.Accountability do
     if completion_exists?(habit, completion_date) do
       {:error, :already_completed_today}
     else
-      with {:ok, %{habit: updated_habit}} <-
+      with {:ok, %{habit: updated_habit, completion: completion}} <-
              Multi.new()
              |> Multi.insert(:completion, %HabitCompletion{
                habit_id: habit.id,
@@ -79,7 +78,7 @@ defmodule Voli.Accountability do
           {:habit_completed, user, updated_habit}
         )
 
-        {:ok, %{habit: updated_habit}}
+        {:ok, %{completion: completion, habit: updated_habit}}
       end
     end
   end
