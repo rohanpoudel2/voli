@@ -536,7 +536,7 @@ defmodule Voli.AccountsTest do
       {:ok, friendship} = Accounts.send_friend_request(user1, user2)
 
       assert {:ok, %Friendship{}} = Accounts.decline_friend_request(friendship)
-      assert Accounts.get_friendship(friendship.id) == nil
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_friendship!(friendship.id) end
     end
 
     test "list_friends/1 returns all accepted friends" do
@@ -560,6 +560,24 @@ defmodule Voli.AccountsTest do
       assert user3.id in friend_ids
       refute user4_pending.id in friend_ids
       assert length(friends_of_user1) == 2
+    end
+
+    test "list_pending_requests/1 returns all pending requests for a user" do
+      user1 = user_fixture()
+      user2_requester = user_fixture()
+      user3_requester = user_fixture()
+
+      {:ok, request1} = Accounts.send_friend_request(user2_requester, user1)
+      {:ok, request2} = Accounts.send_friend_request(user3_requester, user1)
+
+      Accounts.send_friend_request(user1, user_fixture())
+
+      pending_requests = Accounts.list_pending_requests(user1)
+      pending_ids = Enum.map(pending_requests, & &1.id)
+
+      assert request1.id in pending_ids
+      assert request2.id in pending_ids
+      assert length(pending_requests) == 2
     end
   end
 end
