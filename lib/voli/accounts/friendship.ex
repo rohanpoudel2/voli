@@ -19,5 +19,9 @@ defmodule Voli.Accounts.Friendship do
     |> validate_inclusion(:status, ["pending", "accepted", "declined"])
     |> check_constraint(:requester_id, name: :friendships_requester_id_fkey)
     |> check_constraint(:receiver_id, name: :friendships_receiver_id_fkey)
+    |> unique_constraint([:requester_id, :receiver_id],
+      name: :friendships_requester_id_receiver_id_index,
+      message: "Friend request already sent"
+    )
   end
 end
