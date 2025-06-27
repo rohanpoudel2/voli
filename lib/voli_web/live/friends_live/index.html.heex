@@ -30,11 +30,10 @@
       >
         <span>{request.requester.email}</span>
         <div class="space-x-2">
-          <.button  id={"accept-#{request.requester.id}"} phx-click="accept_request" phx-value-id={request.id} class="!py-1 !px-2">
+          <.button phx-click="accept_request" phx-value-id={request.id} class="!py-1 !px-2">
             Accept
           </.button>
           <.button
-            id={"decline-#{request.id}"}
             phx-click="decline_request"
             phx-value-id={request.id}
             class="!py-1 !px-2 bg-gray-400 hover:bg-gray-600"
