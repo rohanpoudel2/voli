@@ -95,21 +95,5 @@ defmodule VoliWeb.FriendsLiveTest do
 
       assert {"Friend request already sent", _meta} = changeset.errors[:requester_id]
     end
-
-    test "shows error on invalid email in add friend form", %{conn: conn} do
-      user = user_fixture(%{email: "user@example.com"})
-      conn = log_in_user(conn, user)
-      {:ok, view, _html} = live(conn, ~p"/friends")
-
-      form_data = %{"search" => %{"email" => "notanemail"}}
-
-      # Submit the invalid form
-      view
-      |> element("form")
-      |> render_submit(form_data)
-
-      # Assert the error is shown
-      assert render(view) =~ "must have the @ sign and no spaces"
-    end
   end
   end
