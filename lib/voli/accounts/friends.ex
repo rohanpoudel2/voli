@@ -12,7 +12,7 @@ defmodule Voli.Accounts.Friends do
     {%{}, %{email: :string}}
     |> Ecto.Changeset.cast(attrs, [:email])
     |> Ecto.Changeset.validate_required([:email])
-    |> Ecto.Changeset.validate_format(:email, ~r/@/, message: "must have the @ sign and no spaces")
+    |> Ecto.Changeset.validate_format(:email, ~r/@/)
   end
 
   @doc false
