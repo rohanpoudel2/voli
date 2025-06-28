@@ -6,7 +6,6 @@ defmodule Voli.Accountability.TimeEntry do
     field :end_time, :naive_datetime
     field :start_time, :naive_datetime
 
-    belongs_to :task, Voli.Accountability.Task, on_replace: :delete
     belongs_to :habit, Voli.Accountability.Habit, on_replace: :delete
 
     timestamps(type: :utc_datetime)

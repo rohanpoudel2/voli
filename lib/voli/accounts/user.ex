@@ -9,7 +9,6 @@ defmodule Voli.Accounts.User do
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 
-    has_many :tasks, Voli.Accountability.Task
     has_many :habits, Voli.Accountability.Habit
     has_many :habit_completions, Voli.Accountability.HabitCompletion
 
