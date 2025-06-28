@@ -3,35 +3,8 @@ defmodule Voli.Accountability do
   alias Ecto.Multi
   alias Voli.Repo
 
-  alias Voli.Accountability.Task
   alias Voli.Accountability.Habit
   alias Voli.Accountability.HabitCompletion
-
-  def create_task(user, attrs \\ %{}) do
-    %Task{user_id: user.id}
-    |> Task.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  def list_user_tasks(user) do
-    Repo.all(
-      from t in Task,
-        where: t.user_id == ^user.id,
-        order_by: [asc: :inserted_at]
-    )
-  end
-
-  def get_task!(id), do: Repo.get!(Task, id)
-
-  def update_task(%Task{} = task, attrs) do
-    task
-    |> Task.changeset(attrs)
-    |> Repo.update()
-  end
-
-  def delete_task(%Task{} = task) do
-    Repo.delete(task)
-  end
 
   def create_habit(user, attrs \\ %{}) do
     %Habit{user_id: user.id}
@@ -124,32 +97,8 @@ defmodule Voli.Accountability do
     Habit.changeset(habit, changes)
   end
 
-  def change_task(%Task{} = task, attrs \\ %{}) do
-    Task.changeset(task, attrs)
-  end
 
   def change_habit(%Habit{} = habit, attrs \\ %{}) do
     Habit.changeset(habit, attrs)
-  end
-
-  def toggle_task_completion(%Task{} = task) do
-    changes =
-      if is_nil(task.completed_at) do
-        %{completed_at: DateTime.utc_now()}
-      else
-        %{completed_at: nil}
-      end
-
-    with {:ok, updated_task} <- Task.changeset(task, changes) |> Repo.update() do
-      if updated_task.completed_at do
-        Phoenix.PubSub.broadcast(
-          Voli.PubSub,
-          "user:#{task.user_id}",
-          {:task_completed, updated_task}
-        )
-      end
-
-      {:ok, updated_task}
-    end
   end
 end
